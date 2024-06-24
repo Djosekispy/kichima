@@ -17,7 +17,7 @@ interface ItemCart {
 
 
 
-export default function Item({nome, valor, quantidade, _id,imagem}:ItemCart){
+export default function ItemFavoritos({nome, valor, quantidade, _id,imagem}:ItemCart){
     const {removeProduct,updateProductquantidade} = useAuth();
     return(
         <View style={styles.container}>
@@ -57,15 +57,6 @@ style={{
     <TouchableOpacity  onPress={ ()=> removeProduct(_id)}>
                   <Feather name ='trash-2' color='#C93545' size={20} />
               </TouchableOpacity>
-    <View style={styles.nameAndPrice}>
-                <TouchableOpacity  onPress={()=>updateProductquantidade(_id,'soma')}>
-                    <Feather name ='plus' style={styles.plus} />
-                    </TouchableOpacity> 
-                    <Text style={styles.plus} >{quantidade}</Text>
-                    <TouchableOpacity   onPress={()=>updateProductquantidade(_id,'sub')}>
-                    <Feather name ='minus' style={styles.plus} />
-                    </TouchableOpacity>
-                </View>
     </View>
         </View>
     );

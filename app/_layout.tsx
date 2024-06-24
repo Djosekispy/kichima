@@ -5,7 +5,8 @@ import { Slot, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-
+import * as Notifications from 'expo-notifications';
+import { router } from 'expo-router';
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/contextApi/authApi';
 import { StatusBar } from 'expo-status-bar';
@@ -19,7 +20,7 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-
+  useNotificationObserver();
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -43,4 +44,34 @@ function RootLayoutNav() {
   </AuthProvider>
   </SafeAreaProvider>
   );
+}
+
+function useNotificationObserver() {
+  useEffect(() => {
+    let isMounted = true;
+
+    function redirect(notification: Notifications.Notification) {
+      const url = notification.request.content.data?.url;
+      if (url) {
+        router.push(url);
+      }
+    }
+
+    Notifications.getLastNotificationResponseAsync()
+      .then(response => {
+        if (!isMounted || !response?.notification) {
+          return;
+        }
+        redirect(response?.notification);
+      });
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      redirect(response.notification);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.remove();
+    };
+  }, []);
 }

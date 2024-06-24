@@ -1,4 +1,5 @@
 import { ItemCarrinho } from "@/utils/cartdb"
+import { string } from "yup"
 
 
 export type LoginType = {
@@ -58,6 +59,20 @@ export type productDTO = {
     id_vendedor: string
 }
 
+export type ProdutctDTOsearch = {
+    _id:{
+        $oid: string
+    },
+    nome: string,
+    descricao: string,
+    preco: number,
+    categoria: string[],
+    taxa_entrega: number,
+    imagens: string[],
+    quantidade: string,
+    localizacao: string,
+    id_vendedor: string
+}
 export type UserTD0 = {
     nome_completo?: string,
     email?:string,
@@ -71,4 +86,28 @@ export type Pedido = {
     total: number,
     tipo_compra: string,
     endereco_entrega: string
+}
+
+export type Historia = {
+_id: string,
+carrinho: IProd,
+tipo_compra: string,
+endereco_entrega: string,
+referencia: string,
+estado:string,
+created_at: string,
+total: string
+}
+
+
+interface IProd {
+    product:ItemCarrinho[],
+}
+
+export interface IComentario {
+    id_produto: string;
+    nome_comentador: string;
+    conteudo: string;
+    estrelas: string;
+    foto: string
 }

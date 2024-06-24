@@ -6,34 +6,56 @@ import image from '../../../assets/images/alca.png'
 import { Ionicons } from "@expo/vector-icons";
 import Feedback from "@/components/deteils/feedback";
 import {styles} from './style'
-import Product from "@/components/home/product";
-import Products from "@/components/home/atom/products";
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from "react";
-import { productDTO } from "@/constants/globalTypes";
+import { IComentario, productDTO } from "@/constants/globalTypes";
 import { isAxiosError } from "axios";
 import api from "@/utils/api";
-import Imagem from "@/components/home/atom/image";
-import Publicity from "@/components/home/publicity";
 import { useAuth } from "@/contextApi/authApi";
 import { ItemCarrinho } from "@/utils/cartdb";
 import { number } from "yup";
+import WrongModal from "@/components/modals/errado";
+import Success from "@/components/modals/certo";
 
-
+export interface IEstrelas{
+  comentados: number,
+  taxaEstrela: number
+}
 
 
 export default function Deteils(){
     const margin = useSafeAreaInsets();
+    const [isLoading, setIsLoading] = useState(false);
+    const [conteudo, setConteudo] = useState('');
+    const [estrelas, setEstrelas] = useState('');
+
     const {id} = useLocalSearchParams();
-   const {saveCart} = useAuth();
+   const {saveCart, user} = useAuth();
     const router = useRouter();
     router.canGoBack();
     const back = ()=>router.back();
+    const [visible, setVisible] = useState(false);
+    const [visible2, setVisible2] = useState(false);
+    const [message2, setMessage2] = useState<string>('');
+    const close = () => setVisible(!visible);
+    const close2 = ()=>setVisible2(!visible2);
+   const [comentariosEstrelas, setComentariosEstrelas] = useState<IEstrelas>({
+    comentados:0,
+    taxaEstrela:0.0
+   });
+
+   const coment = ({comentados,taxaEstrela}:IEstrelas)=>{
+     const data = {
+      comentados,
+      taxaEstrela
+     }
+     setComentariosEstrelas(data);
+   }
 
     const [produtos, setProdutos] = useState<productDTO|null>(null)
     const [modalVisible, setModalVisible] = useState(false);
     const [src, setSrc] = useState<any>(null);
-    const buscarProdutso = async ()=>{
+    const buscarprodutos = async ()=>{
      try {  
          const response = await api.get(`/produto/ver/${id}`);
          const data: productDTO = response.data;
@@ -41,10 +63,90 @@ export default function Deteils(){
          setProdutos(data);
        } catch (error) {
          if (isAxiosError(error)) {
-           console.log(error.response?.data);
+           alert(error.response?.data);
          }
        } 
     }
+
+
+    const addFavoritos = async ()=>{
+      if (!user) {
+        router.replace("/(app)/(auth)/");
+        return;
+      } 
+     
+      try {  
+        const token = user?.token
+        console.log(user?.user?._id)
+        setIsLoading(true)
+        const dados = {
+          userId : user?.user?._id
+        }
+          const response = await api.post(`/produto/adicionar-favorito/${id}`,dados, {
+            headers: {
+              "Content-Type":"multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          alert(response?.data?.message);
+        } catch (error) {
+          if (isAxiosError(error)) {
+           alert(error.response?.data?.error);
+          }
+        }finally{
+          setIsLoading(false)
+        } 
+     }
+
+  const comentar = async ()=>{
+      if (!user) {
+        router.replace("/(app)/(auth)/");
+        return;
+      } 
+     
+      try {  
+        const token = user?.token
+        if (!estrelas || !conteudo) {
+          setMessage2("Informações em Falta");
+          setVisible2(!visible2);
+          return;
+      }
+      if ( parseInt(estrelas) < 1 || parseInt(estrelas) > 5 ) {
+        setMessage2("Apenas valores entre 1 - 5");
+        setVisible2(!visible2);
+        return;
+    }
+        setIsLoading(true)
+        const dados = {
+          foto : user?.user?.foto,
+          nome_comentador : user?.user?.nome_completo,
+          estrelas : estrelas,
+          conteudo: conteudo
+        }
+          const response = await api.post(`/produto/feedBack/${id}`,dados, {
+            headers: {
+              "Content-Type":"multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          setMessage2(response?.data?.message);
+          setVisible(!visible2);
+          setEstrelas('');
+          setConteudo('');
+        } catch (error) {
+          if (isAxiosError(error)) {
+            setMessage2(error.response?.data?.error);
+           setVisible2(!visible2);
+          }else{
+            setMessage2(""+error);
+            setVisible2(!visible2);
+          }
+        }finally{
+          setIsLoading(false)
+        } 
+     }
+
 
     const addProduto = (produto:productDTO)=>{
       const produtoData : ItemCarrinho = {
@@ -59,7 +161,7 @@ export default function Deteils(){
       saveCart(produtoData);
     }
     useEffect(()=>{
-     buscarProdutso();
+     buscarprodutos();
     },[]);
 
 
@@ -67,6 +169,8 @@ export default function Deteils(){
 
     return (
       <>
+       <WrongModal close={close2} msg={message2} visibility={visible2} />
+            <Success close={close} msg={message2} visibility={visible} />
         <ScrollView
         style={{backgroundColor:'#FFF'}}
         showsVerticalScrollIndicator={false}
@@ -91,7 +195,7 @@ export default function Deteils(){
             alignItems:'flex-start',
             justifyContent:'flex-start'
         }}>
-        <Ionicons onPress={back} name='arrow-back' size={30} color='red' />
+        <Ionicons onPress={back} name='arrow-back' size={30} color='black' />
         </View>
           <Header title='Detalhes de Produto'/>
        
@@ -121,7 +225,7 @@ showsHorizontalScrollIndicator={false}
 <View
         style={[styles.reviewTop,{marginBottom:10}]}
         >
-            <TouchableOpacity style={[styles.buttonadd,{backgroundColor:'#FE3A30'}]}>
+            <TouchableOpacity disabled={isLoading} onPress={addFavoritos} style={[styles.buttonadd,{backgroundColor:'#FE3A30'}]}>
                 <Text style={styles.text}>Adiconar ao favoritos</Text>
             </TouchableOpacity>
 
@@ -133,7 +237,7 @@ showsHorizontalScrollIndicator={false}
             <Text style={styles.title}>{produtos?.nome}</Text>
             <Text style={styles.price}>KZ. {produtos?.preco}</Text>
 
-          {  produtos?.taxa_entrega > 0 ? <Text>Frete: {produtos?.taxa_entrega} </Text>
+          {  produtos && produtos.taxa_entrega > 0 ? <Text>Frete: {produtos?.taxa_entrega} </Text>
         :<Text>Frete: N/D </Text>  
         }
           {  produtos?.localizacao  && <Text>Localização: {produtos?.localizacao} </Text>}
@@ -141,9 +245,9 @@ showsHorizontalScrollIndicator={false}
             <View style={styles.footerViews}>
            <View style={[styles.footerViews,{marginRight:12}]}>
            <Ionicons name='star' size={20} color='#FFC120' />
-           <Text>4.6</Text>
+           <Text>{comentariosEstrelas.taxaEstrela}</Text>
            </View>
-            <Text>87 Comentários</Text>
+            <Text>{comentariosEstrelas.comentados} Comentários</Text>
             </View>
         
     <View style={styles.descriptoncontent}>
@@ -154,10 +258,10 @@ showsHorizontalScrollIndicator={false}
     
         <View style={styles.reviewTop}>
           
-            <Text style={{fontWeight:'700', fontSize:18}}>Comentários(87)</Text>
+            <Text style={{fontWeight:'700', fontSize:18}}>Comentários({comentariosEstrelas.comentados})</Text>
             <View style={[styles.footerViews,{marginRight:12}]}>
            <Ionicons name='star' size={20} color='#FFC120' />
-           <Text  style={{fontWeight:'700', fontSize:18}}>4.6</Text>
+           <Text  style={{fontWeight:'700', fontSize:18}}>{comentariosEstrelas.taxaEstrela}</Text>
            </View>
             </View>
 
@@ -167,12 +271,29 @@ showsHorizontalScrollIndicator={false}
       editable={true}
       style={styles.input}
       autoCorrect={true}
+      onChangeText={text =>setConteudo(text)}
+      value={conteudo}
       enterKeyHint="enter"
       multiline
       />
-      <Ionicons name='send' size={30} style={styles.button} color='#0C1A30'/>
+      <TouchableOpacity disabled={isLoading} style={styles.button} onPress={comentar}> 
+      <Ionicons name='send' size={30}  color='#0C1A30'/>
+      </TouchableOpacity>
      </View>
-            <Feedback />
+
+     <View style={styles.form2}>
+      <Text  style={{fontWeight:'400', fontSize:14}}>Definir Estrelas</Text>
+      <TextInput
+      placeholder='Total de Estrelas'
+      editable={true}
+      style={styles.input2}
+      autoCorrect={true}
+      inputMode="numeric"
+      onChangeText={text =>setEstrelas(text)}
+      value={estrelas}
+      />
+     </View>
+            <Feedback id={id} coment={coment}/>
         
 
           </View>

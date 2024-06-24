@@ -39,7 +39,7 @@ export const styles = StyleSheet.create({
 
         height:'100%',
         resizeMode:'center',
-        aspectRatio:1/1
+        aspectRatio:1
     },
     content:{
   width:'100%',
@@ -48,7 +48,8 @@ export const styles = StyleSheet.create({
     },
     title:{
   fontSize:20,
-  fontWeight:'700'
+  fontWeight:'700',
+  marginHorizontal:12
     },
     price:{
         marginVertical:8,
@@ -73,9 +74,25 @@ export const styles = StyleSheet.create({
         marginHorizontal:20,
         position:'relative'
       },
+      form2:{
+        width:'90%',
+        margin:'auto',
+        flexDirection:'row',
+        minHeight:30,
+        marginHorizontal:20,
+        justifyContent:'space-around',
+         alignItems:'center'
+      },
       input:{
         minHeight:50,
         width:'100%',
+        padding:12,
+        borderRadius:16,
+        backgroundColor:'#EDEDED'
+      },
+      input2:{
+        minHeight:50,
+        width:'50%',
         padding:12,
         borderRadius:16,
         backgroundColor:'#EDEDED'
@@ -106,4 +123,5 @@ export const styles = StyleSheet.create({
         height: Dimensions.get('window').height,
         resizeMode: 'contain',
       },
+     
 }); 

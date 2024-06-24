@@ -26,8 +26,10 @@ export const styles = StyleSheet.create({
       position:'absolute',
       top:12,
       right:12
-    }
-,
+    },
+    othersTitle:{
+        color:'black', fontWeight:'700', fontSize:20
+      },      
 historyContent:{
    flexDirection:'row',
    justifyContent:'space-evenly',

@@ -6,8 +6,9 @@ import Cart  from '@/components/carrinho/carrinho'
 import { useAuth } from '@/contextApi/authApi';
 import MeuCarrinho from '@/app/(app)/(others)/carrinho2';
 import { useRouter } from 'expo-router';
+import { getNotify } from '@/utils/notifyDB';
 
-
+const router = useRouter();
 interface NotificationIconProps {
     iconName: React.ComponentProps<typeof Ionicons >['name'];
     title?: string;
@@ -21,13 +22,18 @@ interface CartIconProps {
 
 // Componente para o ícone com notificações não lidas
 const NotificationIcon: React.FC<NotificationIconProps> = ({ iconName, notificationCount }) => (
+
   <View style={{ position: 'relative', marginRight: 20 }}>
+    <TouchableOpacity onPress={()=>router.replace('/(app)/(others)/news')}>
+
     <Ionicons name={iconName} size={24} color='#C93545' />
     {notificationCount > 0 && (
       <View style={styles.notificationBadge}>
         <Text style={styles.notificationBadgeText}>{notificationCount}</Text>
       </View>
     )}
+          
+          </TouchableOpacity>
   </View>
 );
 
@@ -50,11 +56,18 @@ interface Iheader{
 export default function Header({title}:Iheader) {
    const [visibility, setVisibility] = React.useState(false)
    const onclose=()=>setVisibility(!visibility)
+   const [notiAll, setNotiAll] = React.useState(0);
    const { carrinho,carregarCarrinho} = useAuth();
   const router = useRouter();
-  const notificationCount = 2; 
+  const notificationCount = notiAll; 
   const cartItemCount = carrinho.product.length; 
-
+  const notificar = ()=>{
+    getNotify().then(iten => iten && setNotiAll(iten.length));
+  }
+   React.useEffect(()=>{
+    notificar()
+   
+   },[]);
   return (
     <View style={styles.topcontainer}>
     <Cart visibily={visibility} onclose={onclose} />

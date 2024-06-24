@@ -6,8 +6,11 @@ import { styles } from './style';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { isAxiosError } from 'axios';
+import api from '@/utils/api';
+import { useAuth } from '@/contextApi/authApi';
 
 type newPassword = {
     password: string,
@@ -15,7 +18,7 @@ type newPassword = {
 }
 const schema = yup.object({
     password: yup.string().required('* Este campo é obrigatório'),
-    confirmPassword: yup.string().oneOf([yup.ref('senha'), null], '* As senhas devem ser iguais').required('* Este campo é obrigatório'),
+    confirmPassword: yup.string().oneOf([yup.ref('password'), null], '* As senhas devem ser iguais').required('* Este campo é obrigatório'),
   }).required();
 
 export default function ForgetPassword() {
@@ -27,9 +30,9 @@ export default function ForgetPassword() {
   const { control, handleSubmit, formState: { errors }, watch } = useForm<newPassword>({
     resolver: yupResolver(schema),
   });
-
+  const { email } = useAuth();
   const watchFields = watch(['password']);
-
+ const router = useRouter()
   useEffect(() => {
     if (watchFields[0]) {
       setIsBothFieldsFilled(true);
@@ -38,9 +41,22 @@ export default function ForgetPassword() {
     }
   }, [watchFields]);
 
-  const onSubmit = (data:newPassword) => {
+  const onSubmit = async(data:newPassword) => {
     setIsLoading(true);
-    console.log(JSON.stringify(data));
+    try {  
+      const dados = {
+        nova_senha: data.password,
+        email: email
+      }
+        const response = await api.post(`/cliente/repor/nova-senha`,dados);
+        router.replace(`/(app)/(auth)/`);
+      } catch (error) {
+        if (isAxiosError(error)) {
+          alert(error.response?.data.error);
+        }
+      }finally{
+        setIsLoading(false);
+      }
   }
 
   return (
@@ -121,11 +137,11 @@ export default function ForgetPassword() {
                     <ActivityIndicator size={30} color='#3669C9' />
                   </TouchableOpacity>
                   :
-                  <Link href='/(app)/(auth)/' asChild>
+                  
                   <TouchableOpacity style={[styles.button, isBothFieldsFilled && { backgroundColor: '#3669C9' }]} onPress={handleSubmit(onSubmit)} disabled={!isBothFieldsFilled}>
                     <Text style={[styles.text,{color: '#FFFFFF'}]}>Enviar</Text>
                   </TouchableOpacity>
-                  </Link>
+          
               }
             </View>
           </View>

@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import React, { useCallback, useEffect } from 'react';
 import { Modal, Text, View, TouchableOpacity, StyleSheet, FlatList, ScrollView } from 'react-native';
 import { cart } from '@/constants/globalTypes'
 import Item from './item';
 import { useAuth } from '@/contextApi/authApi';
 import { limparCarrinho, obterCarrinho } from '@/utils/cartdb';
+import api from '@/utils/api';
+import { isAxiosError } from 'axios';
 
 
 
@@ -17,10 +19,9 @@ interface IModal{
 }
 
 export default function ActionsProduct({visibily, onclose}:IModal) {
-  const { carrinho,carregarCarrinho} = useAuth();
+  const { carrinho,carregarCarrinho, user} = useAuth();
 
-  
-
+  const router = useRouter()
 useEffect(()=>{
   carregarCarrinho()
 },[])
@@ -61,7 +62,7 @@ renderItem={({item,index})=><Item imagem={item.imagens} _id={item?._id} nome={it
 
 {carrinho && <Text style={styles.total}>
 Total: {carrinho.total}</Text>}
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={()=>router.replace('/(app)/(others)/carrinho2')}>
           <Text style={styles.buttonText}>Finalizar Compra</Text>
         </TouchableOpacity>
       </View>
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
        borderRadius:10,
        width:'100%',
        marginVertical:10,
-       backgroundColor:'#3669C9',
+       backgroundColor:'#000',
        alignItems:'center',
        justifyContent:'center'
   },

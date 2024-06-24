@@ -2,16 +2,59 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Modal, Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icones from './atom/icones';
+import { useRouter } from 'expo-router';
+import api from '@/utils/api';
+import { isAxiosError } from 'axios';
 
 interface IModal{
-    visibily: boolean;
+    visibility: boolean;
     onclose: ()=>void;
 }
 const categories = ['Categoria 1', 'Categoria 2', 'Categoria 3', 'Categoria 4'];
 
-export default function AllCategories({visibily, onclose}:IModal) {
+export default function AllCategories({visibility, onclose}:IModal) {
+  const [categorias, setCategorias] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false); 
+  const [error, setError] = React.useState(''); 
+  const router = useRouter();
+  const fetchCategorias = async () => {
+    setIsLoading(true);
+    setError(''); 
+
+    try {
+      const response = await api.get('/produto/categorias');
+      const data = response.data;
+      setCategorias(data);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        setError(error.response?.data.message); 
+      } else {
+        setError('Um erro inesperado ocorreu'); 
+      }
+    } finally {
+      setIsLoading(false); 
+    }
+  };
+
+  React.useEffect(() => {
+    fetchCategorias();
+  }, []); 
+
+  const renderCategorias = () => (
+    categorias.map((item, index) => (
+      <TouchableOpacity onPress={()=>router.replace(`/(app)/(search)/${item}`)}>
+      <Icones
+        key={index}
+        iconName="logo-amazon"
+        title={item}
+        color="#E4F3EA"
+        colorIcon={`#${index}A9BA`}
+      />
+      </TouchableOpacity>
+    ))
+  );
   return (
-    <Modal animationType="slide" transparent={true} visible={visibily}>
+    <Modal animationType="slide" transparent={true} visible={visibility}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>Todas as Categorias</Text>
@@ -29,36 +72,13 @@ export default function AllCategories({visibily, onclose}:IModal) {
             marginTop:30
           }}
           >
-          <Icones
-            iconName='car'
-            title='Imovéis'
-            color='#E4F3EA'
-            colorIcon='#3A9B7A'
-            />
-              <Icones
-            iconName='gift'
-            title='presentes'
-            color='#FFECE8'
-            colorIcon='#FE6E4C'
-            />
-              <Icones
-            iconName='logo-javascript'
-            title='Cursos'
-            color='#FFF6E4'
-            colorIcon='#FFC120'
-            />
-              <Icones
-            iconName='phone-portrait'
-            title='Eletronicos'
-            color='#F1EDFC'
-            colorIcon='#9B81E5'
-            />
-              <Icones
-            iconName='shirt'
-            title='Roupa'
-            color='#E4F3EA'
-            colorIcon='#3A9B7A'
-            />
+           {isLoading ? (
+          <Text>Carregando Categorias...</Text>
+        ) : error ? (
+          <Text>Erro: {error}</Text>
+        ) : (
+          renderCategorias()
+        )}
           </View>
         </View>
       </View>

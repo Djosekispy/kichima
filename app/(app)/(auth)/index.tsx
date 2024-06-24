@@ -46,7 +46,11 @@ export default function Login() {
     setIsLoading(true);
     setMessage('');
    try {
-     const response = await api.post('cliente/login',data);
+    const userData = {
+      email: data.email,
+      password: data.senha
+    }
+     const response = await api.post('cliente/login',userData);
      if(response.status == 200){
       handleLogin(response.data)
      }
@@ -103,7 +107,7 @@ export default function Login() {
                 <View style={{ position: 'relative' }}>
                   <TextInput
                     style={styles.input}
-                    placeholder="Ex.: example@gmail.com"
+                    placeholder="********"
                     onBlur={onBlur}
                     secureTextEntry={!see}
                     keyboardType='default'
@@ -120,7 +124,7 @@ export default function Login() {
               )}
               name="senha"
             />
-            <View>
+          
               {
                 isLoading ?
                   <TouchableOpacity style={styles.button} disabled>
@@ -131,7 +135,7 @@ export default function Login() {
                     <Text style={[styles.text,{color: '#FFFFFF'}]}>Entrar</Text>
                   </TouchableOpacity>
               }
-            </View>
+          
           </View>
           <View style={styles.footer}>
           <Link href='/(app)/(auth)/forgetpassword'>

@@ -20,7 +20,7 @@ interface AuthContextType {
   carrinho: ItemCarrinho[],
   saveCart: (produto:ItemCarrinho)=>void;
   removeProduct: (id:string)=>void;
-  updateProductquantidade: (id:string,op:string)=>void
+  updateProductquantidade: (id:string,op:string)=>void;
 }
 
 const AuthContext = React.createContext<AuthContextType | any>(null);
@@ -62,12 +62,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
      salvarCarrinho(carrinhoDeCompras.product).then(()=>console.log("Produto adicionado com sucesso")).catch(()=>console.log("Falha ao adiconar produto"));
      carregarCarrinho();
    }
-   const updateCart = (produto:ItemCarrinho)=>{
-    
-   }
-   const deleteCart = (produto:ItemCarrinho)=>{
-    
-   }
+
    const removeProduct = async (id: string) => {
     const index = carrinhoDeCompras.product.findIndex(item => item._id === id);
     if (index !== -1) {
@@ -112,6 +107,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     setUser(userData);
     router.replace("/(app)/(tabs)/");
 };
+
 
 
 

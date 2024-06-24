@@ -5,33 +5,35 @@ import React, { useEffect, useState } from "react";
 import { productDTO } from "@/constants/globalTypes";
 import api from "@/utils/api";
 import { isAxiosError } from "axios";
+import { useAuth } from "@/contextApi/authApi";
 
-
-export default function Product(){
+interface IFeed{
+  id?: string
+}
+export default function ProductosFavoritos({id}:IFeed){
    const [produtos, setProdutos] = useState<productDTO[]>([])
-
-   const buscarProduto = async ()=>{
+   const [mensagem, setMensagem] = useState('');
+   const buscarProdutso = async ()=>{
     try {  
-        const response = await api.get(`/produto/listar`);
+        const response = await api.get(`/produto/feed/${id}`);
         const data: productDTO[] = response.data;
         setProdutos(data);
       } catch (error) {
         if (isAxiosError(error)) {
-          console.log(error.response?.data);
+          setMensagem(error.response?.data?.message);
         }
       } 
    }
- 
    useEffect(()=>{
-    buscarProduto();
+    buscarProdutso();
    },[]);
    
     return (
         <View style={{paddingHorizontal:16, paddingTop:30}}>
         <View style={styles.topcontainer}>
-            <Text style={styles.othersTitle}>Produtos & Serviços disponiveis</Text>
-        </View>   
-         <View
+            <Text style={styles.othersTitle}>Produtos & Serviços Favoritos</Text>
+        </View>      
+        <View
         style={{
             flexDirection:'row',
             flexWrap:'wrap',
@@ -39,15 +41,15 @@ export default function Product(){
             alignItems:'center'
         }}
         >
-     
-          {
-          produtos.map((item,index)=>(
+   {produtos.map((item,index)=>(
     <Products key={index} _id={item._id} nome={item.nome} imagens={item.imagens} preco={item.preco}/>
-   ))
-  
-  }
+   ))}
 
-
+{ 
+        mensagem && <View style={{paddingHorizontal:20, marginTop:100, alignItems:'center', justifyContent:'center'}}>
+     <Text style={{fontWeight:'600', fontFamily:'SpaceMono', fontSize:15}}>{mensagem}</Text>
+      </View>
+    }
    
         </View>
        

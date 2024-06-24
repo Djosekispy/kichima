@@ -1,57 +1,74 @@
-
-import React from 'react'
-import { View, Text, ScrollView } from 'react-native'
-import { styles } from './style'
-import Icones from './atom/icones'
-import AllCategories from './allcategories'
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { styles } from './style'; 
+import Icones from './atom/icones';
+import AllCategories from './allcategories';
+import api from '@/utils/api'; 
+import { isAxiosError } from 'axios';
+import { useRouter } from 'expo-router';
 
 export default function Categories() {
-   const [visibility, setVisibility] = React.useState(false)
-   const onclose=()=>setVisibility(!visibility)
-  return (
-    <View style={{paddingHorizontal:16}}>
-        <View style={styles.topcontainer}>
-            <Text style={{color:'black', fontWeight:'700', fontSize:20}}> Categorias</Text>
-            <Text style={{color: '#3669C9'}} onPress={onclose}> Ver Todos </Text>
-        </View>
-        <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        >
-            <Icones
-            iconName='car'
-            title='Imovéis'
-            color='#E4F3EA'
-            colorIcon='#3A9B7A'
-            />
-              <Icones
-            iconName='gift'
-            title='presentes'
-            color='#FFECE8'
-            colorIcon='#FE6E4C'
-            />
-              <Icones
-            iconName='logo-javascript'
-            title='Cursos'
-            color='#FFF6E4'
-            colorIcon='#FFC120'
-            />
-              <Icones
-            iconName='phone-portrait'
-            title='Eletronicos'
-            color='#F1EDFC'
-            colorIcon='#9B81E5'
-            />
-              <Icones
-            iconName='shirt'
-            title='Roupa'
-            color='#E4F3EA'
-            colorIcon='#3A9B7A'
-            />
-            
-        </ScrollView>
+  const [categorias, setCategorias] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); 
+  const [error, setError] = useState(''); 
+  const [visibility, setVisibility] = React.useState<boolean>(false)
+  const onclose=()=>setVisibility(!visibility)
+  const router = useRouter();
+  const fetchCategorias = async () => {
+    setIsLoading(true);
+    setError(''); 
 
-        <AllCategories visibily={visibility} onclose={onclose}  />
+    try {
+      const response = await api.get('/produto/categorias');
+      const data = response.data;
+      setCategorias(data);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        setError(error.response?.data.message); 
+      } else {
+        setError('Um erro inesperado ocorreu'); 
+      }
+    } finally {
+      setIsLoading(false); 
+    }
+  };
+
+  useEffect(() => {
+    fetchCategorias();
+  }, []); 
+
+  const renderCategorias = () => (
+    categorias.map((item, index) => (
+      <TouchableOpacity onPress={()=>router.replace(`/(app)/(search)/${item}`)}>
+      <Icones
+        key={index}
+        iconName="logo-ionitron"
+        title={item}
+        color="#E4F3EA"
+       colorIcon={`#${index+1}A9BA`}
+      />
+      </TouchableOpacity>
+    ))
+  );
+
+  return (
+    <View style={{ paddingHorizontal: 16 }}>
+      <View style={styles.topcontainer}>
+        <Text style={{ color: 'black', fontWeight: '700', fontSize: 20 }}>
+          Categorias
+        </Text>
+        <Text onPress={onclose}>Ver Mais</Text>
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {isLoading ? (
+          <Text>Carregando Categorias...</Text>
+        ) : error ? (
+          <Text>Erro: {error}</Text>
+        ) : (
+          renderCategorias()
+        )}
+      </ScrollView>
+      <AllCategories visibility={visibility} onclose={onclose} />
     </View>
-  )
+  );
 }

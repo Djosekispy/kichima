@@ -6,7 +6,9 @@ import { styles } from './style';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
+import api from '@/utils/api';
+import { isAxiosError } from 'axios';
 
 type forgetData = {
     email: string
@@ -23,7 +25,8 @@ export default function ForgetPassword() {
   const { control, handleSubmit, formState: { errors }, watch } = useForm<forgetData>({
     resolver: yupResolver(schema),
   });
-
+ const router = useRouter();
+ router.canGoBack()
   const watchFields = watch(['email']);
 
   useEffect(() => {
@@ -34,9 +37,21 @@ export default function ForgetPassword() {
     }
   }, [watchFields]);
 
-  const onSubmit = (data:forgetData) => {
+  const onSubmit = async (data:forgetData) => {
     setIsLoading(true);
-    console.log(JSON.stringify(data));
+    try {  
+      const Email = {
+        'email': data.email
+      }
+        const response = await api.post(`/cliente/repor/senha/enviar`,Email);
+       router.replace(`/(app)/(auth)/${data.email}`)
+      } catch (error) {
+        if (isAxiosError(error)) {
+          alert(error.response?.data?.erros);
+        }
+      }finally{
+        setIsLoading(false);
+      }
   }
 
   return (
@@ -84,9 +99,8 @@ export default function ForgetPassword() {
                   </TouchableOpacity>
                   :
                   <TouchableOpacity style={[styles.button, isBothFieldsFilled && { backgroundColor: '#3669C9' }]} onPress={handleSubmit(onSubmit)} disabled={!isBothFieldsFilled}>
-                    <Link href='/(app)/(auth)/example@gmail.com' asChild>
                     <Text style={{color: '#FFFFFF'}}>Receber Código</Text>
-                  </Link>
+
                   </TouchableOpacity>
               }
             </View>

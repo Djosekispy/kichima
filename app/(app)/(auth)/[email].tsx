@@ -24,6 +24,9 @@ import {
   } from 'react-native-confirmation-code-field';
 import { Link, useGlobalSearchParams,useLocalSearchParams, useRouter } from 'expo-router';
 import { RecoveryTypeData } from '@/constants/globalTypes';
+import { isAxiosError } from 'axios';
+import api from '@/utils/api';
+import { useAuth } from '@/contextApi/authApi';
 
   const CELL_COUNT = 6;
 
@@ -44,6 +47,8 @@ export default function SendCode() {
   const { email } = useLocalSearchParams<{ email: string }>();
   const [value, setValue] = React.useState('');
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const router = useRouter();
+  router.canGoBack();
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
     setValue,
@@ -56,7 +61,7 @@ const { control, handleSubmit, formState: { errors }, watch } = useForm<Recovery
     "two_factor_recovery_codes": value
   },
 });
-
+  const { SetUserEmail } = useAuth();
   const watchFields = watch(['email','two_factor_recovery_codes']);
 
   useEffect(() => {
@@ -67,9 +72,43 @@ const { control, handleSubmit, formState: { errors }, watch } = useForm<Recovery
     }
   }, [watchFields]);
 
-  const onSubmit = (data:RecoveryTypeData) => {
+
+ const reenviar = async ()=>{
+  setIsLoading(true);
+  try {  
+    const dados = {
+      email: email
+    }
+      const response = await api.post(`/cliente/repor/senha/enviar`,dados);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        alert(error.response?.data.error);
+      }
+    }finally{
+      setIsLoading(false);
+    }
+ }
+
+
+
+  const onSubmit = async (data:RecoveryTypeData) => {
     setIsLoading(true);
-    console.log(JSON.stringify(data));
+    console.log(data.two_factor_recovery_codes)
+    try {  
+      const dados = {
+        codigo_reposicao: data.two_factor_recovery_codes,
+        email: data.email
+      }
+      SetUserEmail(data.email)
+        const response = await api.post(`/cliente/repor/confirmar-senha`,dados);
+        router.replace(`/(app)/(auth)/newpassword`);
+      } catch (error) {
+        if (isAxiosError(error)) {
+          alert(error.response?.data.error);
+        }
+      }finally{
+        setIsLoading(false);
+      }
   }
 
   return (
@@ -137,9 +176,9 @@ const { control, handleSubmit, formState: { errors }, watch } = useForm<Recovery
           
         <View style={{ justifyContent: 'left', alignItems: 'left', marginTop: 18 }}>
        
-       <Text>Se não receber nunhuma mensagem dentro de 30 segundos <Link href='/(app)/(auth)/' asChild>
+       <Text>Se não receber nunhuma mensagem dentro de 30 segundos <TouchableOpacity onPress={reenviar}>
        <Text style={{textDecorationLine:'underline', color:'#3669C9'}}>Re-enviar</Text>
-         </Link>
+         </TouchableOpacity>
          
          </Text>
    
@@ -154,9 +193,7 @@ const { control, handleSubmit, formState: { errors }, watch } = useForm<Recovery
                   </TouchableOpacity>
                   :
                   <TouchableOpacity style={[styles.button, isBothFieldsFilled && { backgroundColor: '#3669C9' }]} onPress={handleSubmit(onSubmit)} disabled={!isBothFieldsFilled}>
-                    <Link href='/(app)/(auth)/newpassword' asChild>
                     <Text style={{color: '#FFFFFF'}}>Confirmar Código</Text>
-                    </Link>
                   </TouchableOpacity>
               }
             </View>

@@ -8,7 +8,9 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { LoginType, RegisterType } from '@/constants/globalTypes';
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
+import api from '@/utils/api';
+import { isAxiosError } from 'axios';
 
 const schema = yup.object({
     name: yup.string().required('* Este campo é obrigatório'),
@@ -20,6 +22,7 @@ export default function Register() {
   const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(false);
   const [see, setSee] = useState(false);
+  const router = useRouter()
   const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
   const { control, handleSubmit, formState: { errors }, watch } = useForm<RegisterType>({
     resolver: yupResolver(schema),
@@ -35,9 +38,25 @@ export default function Register() {
     }
   }, [watchFields]);
 
-  const onSubmit = (data: RegisterType) => {
+  const onSubmit = async(data: RegisterType) => {
     setIsLoading(true);
-    console.log(JSON.stringify(data));
+    try {  
+     
+      const user = {
+        nome_completo: data.name,
+        email: data.email,
+        password: data.senha
+      }
+        const response = await api.post(`/cliente/salvar`, user);
+        router.replace('/(app)/(auth)/')
+       console.log(response.status);
+      } catch (error) {
+        if (isAxiosError(error)) {
+          console.log(error.response?.data);
+        }
+      } finally{
+        setIsLoading(false);
+      }
   }
 
   return (
@@ -79,7 +98,7 @@ export default function Register() {
 
 
 
-            <Text style={styles.footerText}>E-mail ou Telefone</Text>
+            <Text style={styles.footerText}>E-mail</Text>
             {errors.email && <Text style={[styles.footerText, { color: '#FE3A30' }]}>{errors.email.message}</Text>}
             <Controller
               control={control}
@@ -103,7 +122,7 @@ export default function Register() {
                 <View style={{ position: 'relative' }}>
                   <TextInput
                     style={styles.input}
-                    placeholder="Ex.: example@gmail.com"
+                    placeholder="Ex.: *****"
                     onBlur={onBlur}
                     secureTextEntry={!see}
                     keyboardType='default'
