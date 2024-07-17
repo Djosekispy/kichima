@@ -39,9 +39,8 @@ export default function Categories() {
 
   const renderCategorias = () => (
     categorias.map((item, index) => (
-      <TouchableOpacity onPress={()=>router.replace(`/(app)/(search)/${item}`)}>
+      <TouchableOpacity onPress={()=>router.replace(`/(app)/(search)/${item}`)} key={index}>
       <Icones
-        key={index}
         iconName="logo-ionitron"
         title={item}
         color="#E4F3EA"

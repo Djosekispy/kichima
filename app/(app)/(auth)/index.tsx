@@ -81,7 +81,7 @@ export default function Login() {
           <Text style={styles.title}>
             Login
           </Text>
-          <Text style={[styles.footerText, { color: '#FE3A30' }]}>{message}</Text>
+          <Text style={[styles.footerText, { color: '#FE3A30', textAlign:'center' }]}>{message}</Text>
           <View style={styles.form}>
             <Text style={styles.footerText}>E-mail ou Telefone</Text>
             {errors.email && <Text style={[styles.footerText, { color: '#FE3A30' }]}>{errors.email.message}</Text>}

@@ -3,12 +3,7 @@ import {Feather, FontAwesome} from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import {StatusBar, Text} from 'react-native';
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={25} {...props} />;
-}
+
 
 export default function TabLayout() {
 
@@ -20,14 +15,11 @@ export default function TabLayout() {
 
       screenOptions={{
        headerShown: false,
-      tabBarActiveTintColor: '#01579b',
-      tabBarLabelStyle:{
-        fontSize:14
-      },
+   
+      tabBarActiveTintColor: '#FFF',
      tabBarStyle:{
-      paddingVertical:12,
-      backgroundColor:'#EDEDED',
-      height:60,
+      paddingVertical:8,
+      backgroundColor:'#000',
       marginTop:0
      }
       }}
@@ -37,24 +29,21 @@ export default function TabLayout() {
         name="index"
         options={{
           title: '',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
-          tabBarLabel:'Inico'
+          tabBarIcon: ({ color, size }) => <FontAwesome name="home" color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="wishlist"
         options={{
           title: '',
-          tabBarIcon: ({ color, size }) => <TabBarIcon name="heart-o" color={color} />,
-          tabBarLabel:'Favoritos'
+          tabBarIcon: ({ color, size }) => <FontAwesome name="heart-o" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="order"
         options={{
           title: '',
-          tabBarIcon: ({ color, size }) => <Feather name="shopping-bag" size={25} color={color} />,
-          tabBarLabel:'Pedidos'
+          tabBarIcon: ({ color, size }) => <FontAwesome name="shopping-bag" size={size} color={color} />,
         }}
       />
 
@@ -63,8 +52,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: '',
-          tabBarIcon: ({ color, size }) => <TabBarIcon name="user" color={color} />,
-          tabBarLabel:'Minha Conta'
+          tabBarIcon: ({ color, size }) => <FontAwesome size={size} name="user" color={color} />,
                 }}
       />
     </Tabs>

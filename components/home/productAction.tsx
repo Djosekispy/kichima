@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { isAxiosError } from 'axios';
 import { Link, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Modal, Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Modal, Text, View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 
 // Suponha que você tenha um array de categorias
 const categories = ['Adicionar aos Favoritos', 'Ver Detalhes'];
@@ -18,14 +18,43 @@ interface IModal{
 }
 
 export default function ActionsProduct({id,visibily, onclose}:IModal) {
-  const {saveCart} = useAuth();
+  const {saveCart, user} = useAuth();
   const router = useRouter();
   router.canGoBack();
   const back = ()=>router.back();
-
+ const [isLoading, setIsLoading] = useState(false);
   const [produtos, setProdutos] = useState<productDTO|null>(null)
   const [modalVisible, setModalVisible] = useState(false);
   const [src, setSrc] = useState<any>(null);
+
+  const addFavoritos = async ()=>{
+    if (!user) {
+      router.replace("/(app)/(auth)/");
+      return;
+    } 
+   
+    setIsLoading(true)
+    try {  
+      const token = user?.token
+      const dados = {
+        userId : user?.user?._id
+      }
+        const response = await api.post(`/produto/adicionar-favorito/${id}`,dados, {
+          headers: {
+            "Content-Type":"multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        alert(response?.data?.message);
+      } catch (error) {
+        if (isAxiosError(error)) {
+         alert(error.response?.data?.error);
+        }
+      }finally{
+        setIsLoading(false)
+      }
+   }
+
   const buscarProdutso = async ()=>{
    try {  
        const response = await api.get(`/produto/ver/${id}`);
@@ -66,8 +95,10 @@ export default function ActionsProduct({id,visibily, onclose}:IModal) {
           <TouchableOpacity style={styles.closeButton} onPress={onclose}>
             <Ionicons name='close' size={30} color='black' />
           </TouchableOpacity>
-            <TouchableOpacity style={styles.categoryItem}>
-              <Text>Adicionar as Favoritos</Text>
+            <TouchableOpacity style={styles.categoryItem} onPress={addFavoritos} disabled={isLoading}>
+           { isLoading ?   <ActivityIndicator size={24} color='skyblue' />
+              : <Text>Adicionar as Favoritos</Text>
+            }
             </TouchableOpacity>
             <Link
             href={`/(app)/(others)/${id}`}

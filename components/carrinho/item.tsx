@@ -15,10 +15,23 @@ interface ItemCart {
 
 }
 
+const MAX_LENGTH = 10; 
+
+const truncateText = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return text.substring(0, maxLength) + '...';
+};
 
 
 export default function Item({nome, valor, quantidade, _id,imagem}:ItemCart){
     const {removeProduct,updateProductquantidade} = useAuth();
+
+    const MyComponent = ( {nome}) => {
+        return <Text style={styles.name}>{truncateText(nome, MAX_LENGTH)}</Text>;
+      };
+
     return(
         <View style={styles.container}>
 
@@ -45,7 +58,7 @@ style={{
             href={`/(app)/(others)/${_id}`}
             asChild
             >
-    <Text style={styles.name}>{nome}</Text>
+    <MyComponent nome={nome}/>
             </Link>
     <Text style={styles.price}>Kz.{valor}</Text>
     </View>
@@ -87,7 +100,7 @@ const styles = StyleSheet.create({
     },
     titleandMoney:{
         flexDirection:'column',
-        alignItems:'flex-end',
+        alignItems:'flex-start',
         justifyContent:'space-between',
         gap:20
     },

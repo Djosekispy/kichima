@@ -67,7 +67,7 @@ export const styles = StyleSheet.create({
   },
 productContainer:{
   backgroundColor:'#FAFAFA',
-  width:170,
+  width:'45%',
   paddingHorizontal:8,
   height:250,
   borderRadius:12,

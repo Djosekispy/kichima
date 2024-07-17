@@ -215,7 +215,7 @@ export default function Profile() {
               justifyContent:'flex-end',
               flexDirection:'row',
               alignItems:'flex-end',
-              paddingHorizontal:12
+              paddingHorizontal:'5%'
             }}>
 
               {

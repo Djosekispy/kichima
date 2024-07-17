@@ -4,6 +4,7 @@ import { Text, View, Image } from 'react-native'
 import furadaira from '../../../assets/images/furadeira.png'
 import { styles } from '../style';
 import ActionsProduct from '../productAction';
+import { ipaddress } from '@/utils/api';
 
 
 interface produtoDTO {
@@ -26,7 +27,7 @@ style={{
     height:150
 }}
 >
-        <Image source={{uri: `http://192.168.1.103:8000/${imagens[0]}`}} 
+        <Image source={{uri: `${ipaddress}/${imagens[0]}`}} 
         resizeMode='contain'
         style={{
            width:'100%',
