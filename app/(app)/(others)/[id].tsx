@@ -1,21 +1,20 @@
 import Header from "@/components/home/header";
-import { FlatList, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
-import image from '../../../assets/images/alca.png'
 import { Ionicons } from "@expo/vector-icons";
 import Feedback from "@/components/deteils/feedback";
 import {styles} from './style'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from "react";
-import { IComentario, productDTO } from "@/constants/globalTypes";
+import {  productDTO } from "@/constants/globalTypes";
 import { isAxiosError } from "axios";
-import api from "@/utils/api";
+import api, { ipaddress } from "@/utils/api";
 import { useAuth } from "@/contextApi/authApi";
 import { ItemCarrinho } from "@/utils/cartdb";
-import { number } from "yup";
 import WrongModal from "@/components/modals/errado";
 import Success from "@/components/modals/certo";
+import Comments from "@/components/modals/comentario";
 
 export interface IEstrelas{
   comentados: number,
@@ -36,10 +35,14 @@ export default function Deteils(){
     const back = ()=>router.back();
     const [visible, setVisible] = useState(false);
     const [visible2, setVisible2] = useState(false);
+    const [visible3, setVisible3] = useState(false);
     const [message2, setMessage2] = useState<string>('');
+
     const close = () => setVisible(!visible);
     const close2 = ()=>setVisible2(!visible2);
-   const [comentariosEstrelas, setComentariosEstrelas] = useState<IEstrelas>({
+    const close3 = ()=>setVisible3(!visible3);
+
+    const [comentariosEstrelas, setComentariosEstrelas] = useState<IEstrelas>({
     comentados:0,
     taxaEstrela:0.0
    });
@@ -171,6 +174,7 @@ export default function Deteils(){
       <>
        <WrongModal close={close2} msg={message2} visibility={visible2} />
             <Success close={close} msg={message2} visibility={visible} />
+            <Comments visibility={visible3} onclose={close3} comentar={comentar} />
         <ScrollView
         style={{backgroundColor:'#FFF'}}
         showsVerticalScrollIndicator={false}
@@ -207,16 +211,16 @@ showsHorizontalScrollIndicator={false}
         <TouchableOpacity
         key={index}
         onPress={()=>{
-            setSrc(`http://192.168.1.103:8000/${item}`);
+            setSrc(`${ipaddress}/${item}`);
             setModalVisible(!modalVisible);
         }}
         >
-         <Image key={index} source={{uri: `http://192.168.1.103:8000/${item}`}}
+         <Image key={index} source={{uri: `${ipaddress}/${item}`}}
          height={300} width={300}
         style={{
-            resizeMode:'cover',
+            resizeMode:'contain',
             marginRight:12,
-            borderRadius:15
+           
         }}
         />
         </TouchableOpacity>
@@ -225,11 +229,11 @@ showsHorizontalScrollIndicator={false}
 <View
         style={[styles.reviewTop,{marginBottom:10}]}
         >
-            <TouchableOpacity disabled={isLoading} onPress={addFavoritos} style={[styles.buttonadd,{backgroundColor:'#FE3A30'}]}>
+            <TouchableOpacity disabled={isLoading} onPress={addFavoritos} style={[styles.buttonadd,{backgroundColor:'#e91e63'}]}>
                 <Text style={styles.text}>Adiconar ao favoritos</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={()=>produtos && addProduto(produtos)} style={[styles.buttonadd,{backgroundColor:'#3669C9'}]}>
+            <TouchableOpacity onPress={()=>produtos && addProduto(produtos)} style={[styles.buttonadd,{backgroundColor:'#000'}]}>
                 <Text style={styles.text}>Adiconar ao Carrinho</Text>
             </TouchableOpacity>
         </View>
@@ -255,9 +259,11 @@ showsHorizontalScrollIndicator={false}
         <Text style={styles.descriptionText}>{produtos?.descricao}</Text>
     </View>
         </View>
-    
+      { user.user && <TouchableOpacity style={styles.commentButton} onPress={close3}>
+            <Text style={{color:'white'}}>Avaliar Produto</Text>
+          </TouchableOpacity>}
         <View style={styles.reviewTop}>
-          
+        
             <Text style={{fontWeight:'700', fontSize:18}}>Comentários({comentariosEstrelas.comentados})</Text>
             <View style={[styles.footerViews,{marginRight:12}]}>
            <Ionicons name='star' size={20} color='#FFC120' />
@@ -265,34 +271,6 @@ showsHorizontalScrollIndicator={false}
            </View>
             </View>
 
-            <View style={styles.form}>
-      <TextInput
-      placeholder='Deixe seu Comentário'
-      editable={true}
-      style={styles.input}
-      autoCorrect={true}
-      onChangeText={text =>setConteudo(text)}
-      value={conteudo}
-      enterKeyHint="enter"
-      multiline
-      />
-      <TouchableOpacity disabled={isLoading} style={styles.button} onPress={comentar}> 
-      <Ionicons name='send' size={30}  color='#0C1A30'/>
-      </TouchableOpacity>
-     </View>
-
-     <View style={styles.form2}>
-      <Text  style={{fontWeight:'400', fontSize:14}}>Definir Estrelas</Text>
-      <TextInput
-      placeholder='Total de Estrelas'
-      editable={true}
-      style={styles.input2}
-      autoCorrect={true}
-      inputMode="numeric"
-      onChangeText={text =>setEstrelas(text)}
-      value={estrelas}
-      />
-     </View>
             <Feedback id={id} coment={coment}/>
         
 

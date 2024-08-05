@@ -12,6 +12,16 @@ import api from "@/utils/api";
 import { isAxiosError } from "axios";
 import WrongModal from "../modals/errado";
 import Success from "../modals/certo";
+import { v4 as uuidv4 } from 'uuid';
+
+
+function formatData(data: any) {
+    const newdata = new Date(data);
+    return `${newdata.getDate()}-${newdata.getMonth() + 1}-${newdata.getFullYear()}`;
+}
+
+
+
 
 export default function OrderData({ carrinho, created_at, endereco_entrega, estado, referencia, tipo_compra, _id, total }: Historia) {
     const [visible, setVisible] = React.useState(false);
@@ -27,41 +37,43 @@ export default function OrderData({ carrinho, created_at, endereco_entrega, esta
    const [visible3, setVisible3] = React.useState(false);
    const close3 = ()=>setVisible3(!visible3);
 
-    const handleFilePick = async () => {
-        setIsLoading(true)
-        try {
-            const result = await DocumentPicker.getDocumentAsync({
-              type: '*/*', 
-            });
-        
-            if (!result.canceled) {
-              const file = result.assets[0];
-        
-              try {
-               
+   const handleFilePick = async () => {
+    setIsLoading(true);
+    try {
+        const result = await DocumentPicker.getDocumentAsync({
+            type: '*/*',
+        });
+
+        if (!result.canceled) {
+            const file = result.assets[0];
+
+            try {
                 const base64 = await FileSystem.readAsStringAsync(file.uri, { encoding: 'base64' });
-                const path = `uploads/${file.name}`;
+                const uniqueName = `${new Date()}-${file.name}`;
+                const path = `uploads/${uniqueName}`; 
                 const contentType = file.mimeType;
-                const url = await supabase.storage.from('compra').upload(path, decode(base64), { contentType });
+
+                const url = await supabase.storage.from('comprovativo').upload(path, decode(base64), { contentType });
                 setFile('' + url.data?.path);  
-                if(url.error){
-                    setMessage2(''+url.error.message);
-                    setFile('')
+                
+                if (url.error) {
+                    setMessage2('' + url.error.message);
+                    setFile('');
                     setVisible3(!visible3);
                 }
-              } catch (error) {
-                setMessage2(`* Erro no Upload: ${error}`);
+            } catch (error) {
+                setMessage2(`Erro no Upload: ${error}`);
                 setVisible3(!visible3);
-                    setFile('')
-              }
+                setFile('');
             }
-          } catch (error) {
-            alert(`* Erro ao carregar arquivo: ${error}`);
-            setFile('')
-          }finally{
-            setIsLoading(false)
-          }
-      };
+        }
+    } catch (error) {
+        alert(`* Erro ao carregar arquivo: ${error}`);
+        setFile('');
+    } finally {
+        setIsLoading(false);
+    }
+};
 
       const save = async (url: string) => {
         setIsLoading(true);
@@ -185,8 +197,9 @@ export default function OrderData({ carrinho, created_at, endereco_entrega, esta
                 <Text>{estado}</Text>
             </View>
             <View style={styles.viewState}>
-                <Text style={styles.titleContent}>Tipo de Compra</Text>
-                <Text>{tipo_compra}</Text>
+             <Text style={styles.titleContent}>Data</Text>
+                    <Text>{formatData(created_at)}</Text>
+                
             </View>
             {visible && <View>
                 <View>
@@ -206,8 +219,8 @@ export default function OrderData({ carrinho, created_at, endereco_entrega, esta
                     <Text>{endereco_entrega}</Text>
                 </View>
                 <View style={styles.viewState}>
-                    <Text style={styles.titleContent}>Data</Text>
-                    <Text>{created_at}</Text>
+                    <Text style={styles.titleContent}>Tipo de Compra</Text>
+                <Text>{tipo_compra}</Text>
                 </View>
             </View>}
             <View style={styles.viewState}>
@@ -215,7 +228,7 @@ export default function OrderData({ carrinho, created_at, endereco_entrega, esta
                 <Text>{total}</Text>
             </View>
             {
-                estado === 'confirmado' && tipo_compra === 'cash' ?
+                estado === 'confirmado'  ?
                 <View style={styles.viewState}>
                     <TouchableOpacity style={styles.button2} onPress={createPDF} disabled={isLoading}>
                 <Text  style={[styles.titleContent, {color: 'white',textTransform:'uppercase'}]}> Comprovativo</Text>
@@ -227,7 +240,7 @@ export default function OrderData({ carrinho, created_at, endereco_entrega, esta
   {  isLoading ? (
       <ActivityIndicator size={24} color='white' />
     ) : (
-      <Text style={[styles.titleContent, {color: 'white',textTransform:'uppercase'}]}>Enviar comprovativo</Text>
+      <Text style={[styles.titleContent, {color: 'white',textTransform:'uppercase'}]}>Enviar</Text>
     )}
     </TouchableOpacity>
   ) : (
@@ -235,7 +248,7 @@ export default function OrderData({ carrinho, created_at, endereco_entrega, esta
    { isLoading ? (
       <ActivityIndicator size={24} color='white' />
     ) : (
-      <Text style={[styles.titleContent, {color: 'white',textTransform:'uppercase'}]}>Pagar</Text>
+      <Text style={[styles.titleContent, {color: 'white',textTransform:'uppercase'}]}>Carregar</Text>
     )}
     </TouchableOpacity>
   )
@@ -281,14 +294,12 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 15,
         textAlign: 'left',
-        paddingHorizontal: 12,
         marginVertical: 5,
-        fontFamily: 'SpaceMono',
-        fontStyle: 'italic'
+        fontFamily: 'SpaceMono'
     },
     viewState: {
         width: '100%',
-        paddingHorizontal: 4,
+
         flexDirection: 'row',
         justifyContent: 'space-between'
     },

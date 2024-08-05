@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     }),
   },
     titleTop:{
-        color: '#3669C9',
+        color: '#000',
         fontSize:24,
         textAlign:'center',
         fontWeight:'700'

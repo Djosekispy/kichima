@@ -1,11 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 
+
 // Create Supabase client
-export const supabase = createClient('https://bzoqkiaxcbjghdmwrfqr.supabase.co', 
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6b3FraWF4Y2JqZ2hkbXdyZnFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU2MDQ5MDksImV4cCI6MjAzMTE4MDkwOX0.c1tOwzEsOtGro599xm8Jp8yWCel7UjGuAk5KVl5__aQ')
+export const supabase = createClient('https://dvjujuvyjyjkjoptpeft.supabase.co', 
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2anVqdXZ5anlqa2pvcHRwZWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTUzNDI2MzcsImV4cCI6MjAzMDkxODYzN30.s1-rN2RXhxMHIli7HqaOqXMDHMxo0c4LMUsquc000sg')
 
 
-export const SupabaseStorage = 'https://bzoqkiaxcbjghdmwrfqr.supabase.co/storage/v1/object/public/perfil'
+export const SupabaseStorage = 'https://dvjujuvyjyjkjoptpeft.supabase.co/storage/v1/object/public/perfil'
 
-export const SupabaseStorage2 = 'https://bzoqkiaxcbjghdmwrfqr.supabase.co/storage/v1/object/public/compra'
+export const SupabaseStorage2 = 'https://dvjujuvyjyjkjoptpeft.supabase.co/storage/v1/object/public/comprovativo'
 

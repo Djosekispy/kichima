@@ -28,6 +28,7 @@ export default function ProductosFavoritos({id}:IFeed){
         const response = await api.get(`/produto/feed/${id}`);
         const data: ProdutctDTOsearch[] = response.data;
         reorganizar(data);
+        setMensagem('');
       } catch (error) {
         if (isAxiosError(error)) {
           setMensagem(error.response?.data?.message);
@@ -57,7 +58,7 @@ export default function ProductosFavoritos({id}:IFeed){
         <View style={styles.topcontainer}>
             <Text style={styles.othersTitle}>Produtos & Serviços Favoritos</Text>
         </View>   
-        <Button title="Mais recentes" onPress={onRefresh} color='#004d40'/>   
+        <Button title="Mais recentes" onPress={onRefresh} color='#000'/>   
         <View
         style={{
             flexDirection:'row',

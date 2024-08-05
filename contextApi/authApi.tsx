@@ -1,6 +1,6 @@
 import { cart, LoginResponse } from "@/constants/globalTypes";
 import api from "@/utils/api";
-import { ItemCarrinho, obterCarrinho, salvarCarrinho } from "@/utils/cartdb";
+import { atualizarCarrinho, ItemCarrinho, obterCarrinho, salvarCarrinho } from "@/utils/cartdb";
 import { saveUserData } from "@/utils/userdb";
 import { isAxiosError } from "axios";
 import { useRouter, useSegments } from "expo-router";
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     carrinhoDeCompras.product.push(produto);
     const preco =  carrinhoDeCompras.total + produto.preco
     carrinhoDeCompras.total = preco; 
-     salvarCarrinho(carrinhoDeCompras.product).then(()=>console.log("Produto adicionado com sucesso")).catch(()=>console.log("Falha ao adiconar produto"));
+    carrinhoDeCompras.product.map(async(item)=>await atualizarCarrinho(item))
      carregarCarrinho();
    }
 
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     const index = carrinhoDeCompras.product.findIndex(item => item._id === id);
     if (index !== -1) {
       carrinhoDeCompras.product.splice(index, 1);
-        await salvarCarrinho(carrinhoDeCompras.product);
+     await salvarCarrinho(carrinhoDeCompras.product)
     }
     carregarCarrinho();
   };
@@ -77,11 +77,11 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     if (index !== -1) {
       if(op ==='soma'){
         carrinhoDeCompras.product[index].quantidade = carrinhoDeCompras.product[index].quantidade +1; 
-        await salvarCarrinho(carrinhoDeCompras.product);
+        await salvarCarrinho(carrinhoDeCompras.product)
       }else{
         if( carrinhoDeCompras.product[index].quantidade > 2){
         carrinhoDeCompras.product[index].quantidade = carrinhoDeCompras.product[index].quantidade - 1; 
-        await salvarCarrinho(carrinhoDeCompras.product);
+        await salvarCarrinho(carrinhoDeCompras.product)
       }else{
         removeProduct(id)
       }
@@ -109,7 +109,9 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 };
 
 
-
+const logout = ()=>{
+  setUser('');
+}
 
   React.useEffect(() => {
     if (user === undefined) return;

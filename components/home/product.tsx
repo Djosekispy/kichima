@@ -47,11 +47,11 @@ export default function Product(){
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        style={{paddingHorizontal:16, paddingTop:30, flex:1}}>
+        style={{paddingHorizontal:16, paddingTop:10, flex:1}}>
         <View style={styles.topcontainer}>
-            <Text style={styles.othersTitle}>Produtos & Serviços disponiveis</Text>
+            <Text style={styles.othersTitle}>Produtos & Serviços Disponíveis</Text>
         </View>   
-        <Button title="Mais recentes" onPress={onRefresh} color='#004d40'/>
+        <Button title="Mais recentes" onPress={onRefresh} color='#000' />
          <View
         style={{
             flexDirection:'row',
@@ -63,7 +63,18 @@ export default function Product(){
      
           {
           produtos.map((item,index)=>(
-    <Products key={index} _id={item._id} nome={item.nome} imagens={item.imagens} preco={item.preco}/>
+    <Products key={index} 
+          _id={item._id} 
+          taxa_entrega={item.taxa_entrega} 
+          nome={item.nome} 
+          imagens={item.imagens} 
+          preco={item.preco}
+          id_vendedor={item.id_vendedor}
+          categoria={item.categoria}
+          descricao={item.descricao}
+          localizacao={item.localizacao}
+          quantidade={item.quantidade}
+          />
    ))
   
   }

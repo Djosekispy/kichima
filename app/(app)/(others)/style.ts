@@ -19,6 +19,15 @@ export const styles = StyleSheet.create({
         top:12,
         right:12
       },
+      commentButton:{
+     width:'90%',
+     backgroundColor:'#000',
+     borderRadius:12,
+     alignItems:'center',
+     justifyContent: 'center',
+     marginVertical: 8,
+     padding: 10
+      },
     descriptoncontent:{
    width:'100%',
    borderBottomWidth:2,

@@ -6,6 +6,7 @@ import { isAxiosError } from 'axios';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react'
 import { Text, View,ScrollView, StyleSheet,RefreshControl } from 'react-native'
+import { Card, Title, Paragraph } from 'react-native-paper';
 
 export default function Order() {
   const {user} = useAuth();
@@ -49,8 +50,15 @@ React.useEffect(()=>{
 
   return (
     <View style={styles.container}>
+   
       <Text style={styles.title}>Meus Pedidos</Text>
-
+   <Card style={styles.card}>
+        <Card.Content>
+          <Title>Referências de Pagamento</Title>
+          <Paragraph>BFA: 0004 0000 9876 9876 8732 1</Paragraph>
+          <Paragraph>BAI: 0001 0000 0132 0987 8912 2 </Paragraph>
+        </Card.Content>
+      </Card>
 <ScrollView  refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -90,6 +98,12 @@ const styles = StyleSheet.create({
   title:{
     fontWeight:'700',
     fontSize:24,
-    textAlign:'center'
+    textAlign:'center',
+    marginVertical: 4
+  },
+    card: {
+    width: '90%',
+    borderRadius: 10,
+    elevation: 3,
   }
 });

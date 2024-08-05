@@ -176,11 +176,19 @@ export default function Profile() {
     } 
   },[])
   return (
-    <View style={[styles.container, {paddingTop: insets.top+12}]} >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{flex:1}}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+<View style={{flex: 1, justifyContent:'center', alignItems: 'center', paddingTop: 20}}>
+
         <WrongModal close={close3} msg={message2} visibility={visible3} />
             <Success close={close2} msg={message2} visibility={visible2} />
 
-            <View style={{  
+               <View style={{  
              width: 150,
              height: 150,
              position:'relative',
@@ -201,52 +209,9 @@ export default function Profile() {
           <Text style={styles.title}>
           {user?.user?.nome_completo}
           </Text>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{flex:1}}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <View style={[ { paddingTop: insets.top }]}>
-          <View style={styles.form2}>
-            <View style={{
-              width:'100%',
-              justifyContent:'flex-end',
-              flexDirection:'row',
-              alignItems:'flex-end',
-              paddingHorizontal:'5%'
-            }}>
-
-              {
-                edit ?   <TouchableOpacity  style={{
-                  padding:8,
-                  backgroundColor:'green',
-                  borderRadius:12,
-                  alignItems:'center'
-                }}
-                onPress={()=>setEdit(!edit)}
-                >
-                  <Text>Fechar</Text>
-                </TouchableOpacity>
-
-                :
-                <TouchableOpacity style={{
-                  padding:8,
-                  backgroundColor:'skyblue',
-                  borderRadius:12,
-                  width:100,
-                  alignItems:'center'
-                }}
-                onPress={()=>setEdit(!edit)}
-                >
-                  <Text>Editar</Text>
-                </TouchableOpacity>
-              }
-          
-
-          
-            </View>
+        <View >
+          <View style={{gap: 8}} >
+           
            
 
           <Text style={styles.footerText}>Nome Completo</Text>
@@ -354,9 +319,43 @@ export default function Profile() {
             <View style={{width:'100%'}}>
              <Text style={[styles.text,{color: '#000', paddingVertical:10}]}> * Seus Dados não são compartilhados com ninguém</Text>
             </View>
+
+            <View style={{gap: 12}}>
+
+{
+  edit ?   <TouchableOpacity  style={{
+    padding:8,
+    backgroundColor:'green',
+    borderRadius:12, 
+    marginBottom: 8,
+    alignItems:'center'
+  }}
+  onPress={()=>setEdit(!edit)}
+  >
+    <Text>Fechar</Text>
+  </TouchableOpacity>
+
+  :
+  <TouchableOpacity style={{
+    padding:8,
+    backgroundColor:'skyblue',
+    borderRadius:12,
+    marginBottom: 8,
+    width:100,
+    alignItems:'center'
+  }}
+  onPress={()=>setEdit(!edit)}
+  >
+    <Text>Editar</Text>
+  </TouchableOpacity>
+}
+
+
+
+</View>
           </View>
         </View>
+        </View>
       </ScrollView>
-    </View>
   )
 }

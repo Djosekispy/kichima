@@ -42,15 +42,12 @@ export default function AllCategories({visibility, onclose}:IModal) {
 
   const renderCategorias = () => (
     categorias.map((item, index) => (
-      <TouchableOpacity onPress={()=>router.replace(`/(app)/(search)/${item}`)}>
-      <Icones
-        key={index}
-        iconName="logo-amazon"
-        title={item}
-        color="#E4F3EA"
-        colorIcon={`#${index}A9BA`}
-      />
-      </TouchableOpacity>
+      <TouchableOpacity 
+      onPress={()=>router.replace(`/(app)/(search)/${item}`)}
+      style={{padding: 4,paddingHorizontal: 8, marginLeft: 2, borderRadius: 10, backgroundColor:'#000'}}   
+      key={index}>
+    <Text style={{color:"#E4F3EA"}}>{item}</Text>
+    </TouchableOpacity>
     ))
   );
   return (
