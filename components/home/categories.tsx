@@ -41,7 +41,7 @@ export default function Categories() {
     categorias.map((item, index) => (
       <TouchableOpacity 
         onPress={()=>router.replace(`/(app)/(search)/${item}`)}
-        style={{padding: 4,paddingHorizontal: 8, marginLeft: 2, borderRadius: 20, backgroundColor:'#000'}}   
+        style={{padding: 4, paddingHorizontal: 12, marginLeft: 2, borderRadius: 10, backgroundColor:'#000'}}   
         key={index}>
       <Text style={{color:"#E4F3EA"}}>{item}</Text>
       </TouchableOpacity>

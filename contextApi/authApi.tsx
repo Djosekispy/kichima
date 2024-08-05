@@ -1,7 +1,7 @@
 import { cart, LoginResponse } from "@/constants/globalTypes";
 import api from "@/utils/api";
 import { atualizarCarrinho, ItemCarrinho, obterCarrinho, salvarCarrinho } from "@/utils/cartdb";
-import { saveUserData } from "@/utils/userdb";
+import { deleteUserData, saveUserData } from "@/utils/userdb";
 import { isAxiosError } from "axios";
 import { useRouter, useSegments } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -109,8 +109,10 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 };
 
 
-const logout = ()=>{
+const logout = async()=>{
   setUser('');
+  await deleteUserData();
+  
 }
 
   React.useEffect(() => {

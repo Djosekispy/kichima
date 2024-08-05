@@ -64,11 +64,8 @@ export default function Products({_id,imagens,nome,preco,id_vendedor,taxa_entreg
                 paddingTop:8
             }}
             >
-                <Text>
-                <Feather name="star" size={16} color="#FFC120" />
-                    4.6</Text>
-                <Text>86 Reviews</Text>
-                <Feather name="more-vertical" size={24} color="black" onPress={onclose}/>
+                
+                <Text style={styles.verMais} onPress={onclose}>Ver Mais</Text>
             </View>
         </View>
         <TouchableOpacity style={styles.button} onPress={addProduto}>
@@ -104,6 +101,12 @@ const styles = StyleSheet.create({
         marginTop:20,
         marginRight: 4
       },
+      verMais: {
+        fontSize: 12,
+        textDecorationStyle: 'solid',
+        textDecorationLine:'underline',
+        color: 'darkblue'
+      }
 
    
   });

@@ -1,7 +1,7 @@
 import React from 'react';
-import {Feather, FontAwesome} from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import {StatusBar, Text} from 'react-native';
+import { StatusBar } from 'react-native';
 
 
 
@@ -53,6 +53,14 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarIcon: ({ color, size }) => <FontAwesome size={size} name="user" color={color} />,
+                }}
+      />
+
+<Tabs.Screen
+        name="contact"
+        options={{
+          title: '',
+          tabBarIcon: ({ color, size }) =><FontAwesome5 name="teamspeak" size={size} color={color}  />,
                 }}
       />
     </Tabs>
